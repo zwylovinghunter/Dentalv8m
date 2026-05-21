@@ -76,7 +76,7 @@ from .conv import (
     RepConv,
     SpatialAttention,
 )
-from .dental_ablation import SPDConv
+from .dental_ablation import CoordAtt, SPDConv
 from .head import (
     OBB,
     OBB26,
@@ -145,6 +145,7 @@ __all__ = (
     "ChannelAttention",
     "Classify",
     "Concat",
+    "CoordAtt",
     "ContrastiveHead",
     "Conv",
     "Conv2",
