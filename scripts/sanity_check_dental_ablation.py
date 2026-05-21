@@ -4,8 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import sys
+from pathlib import Path
 
 import torch
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 from ultralytics import YOLO
 
 
