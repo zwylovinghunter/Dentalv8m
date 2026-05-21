@@ -76,7 +76,7 @@ from .conv import (
     RepConv,
     SpatialAttention,
 )
-from .dental_ablation import CoordAtt, SPDConv
+from .dental_ablation import CoordAtt, DyHeadBlock, DyHeadDetect, SPDConv
 from .head import (
     OBB,
     OBB26,
@@ -155,6 +155,8 @@ __all__ = (
     "DeformableTransformerDecoder",
     "DeformableTransformerDecoderLayer",
     "Detect",
+    "DyHeadBlock",
+    "DyHeadDetect",
     "Focus",
     "GhostBottleneck",
     "GhostConv",

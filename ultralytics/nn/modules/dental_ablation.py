@@ -8,6 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .conv import Conv
+from .head import Detect
 
 
 class SPDConv(nn.Module):
@@ -58,3 +59,43 @@ class CoordAtt(nn.Module):
         a_h = self.conv_h(x_h).sigmoid()
         a_w = self.conv_w(x_w).sigmoid()
         return identity * a_h * a_w
+
+
+class DyHeadBlock(nn.Module):
+    """Lightweight task/spatial feature refinement for P3/P4/P5."""
+
+    def __init__(self, channels: tuple[int, ...], reduction: int = 16):
+        super().__init__()
+        self.local = nn.ModuleList(Conv(c, c, 3) for c in channels)
+        self.spatial = nn.ModuleList(nn.Conv2d(c, 1, 1) for c in channels)
+        self.task = nn.ModuleList(
+            nn.Sequential(
+                nn.AdaptiveAvgPool2d(1),
+                nn.Conv2d(c, max(8, c // reduction), 1, bias=False),
+                nn.SiLU(),
+                nn.Conv2d(max(8, c // reduction), c, 1, bias=True),
+            )
+            for c in channels
+        )
+        self.gamma = nn.ParameterList(nn.Parameter(torch.zeros(1)) for _ in channels)
+
+    def forward(self, x: list[torch.Tensor]) -> list[torch.Tensor]:
+        out = []
+        for i, xi in enumerate(x):
+            y = self.local[i](xi)
+            y = y * self.spatial[i](y).sigmoid() * self.task[i](y).sigmoid()
+            out.append(xi + self.gamma[i] * y)
+        return out
+
+
+class DyHeadDetect(Detect):
+    """YOLO Detect head with lightweight Dynamic Head refinement before Detect."""
+
+    def __init__(self, nc: int = 80, reg_max=16, end2end=False, ch: tuple = (), repeats: int = 1):
+        super().__init__(nc=nc, reg_max=reg_max, end2end=end2end, ch=ch)
+        self.dyhead = nn.ModuleList(DyHeadBlock(tuple(ch)) for _ in range(repeats))
+
+    def forward(self, x: list[torch.Tensor]):
+        for block in self.dyhead:
+            x = block(x)
+        return super().forward(x)
