@@ -76,6 +76,7 @@ from .conv import (
     RepConv,
     SpatialAttention,
 )
+from .dental_ablation import SPDConv
 from .head import (
     OBB,
     OBB26,
@@ -180,6 +181,7 @@ __all__ = (
     "Segment26",
     "SemanticSegment",
     "SpatialAttention",
+    "SPDConv",
     "TorchVision",
     "TransformerBlock",
     "TransformerEncoderLayer",
