@@ -9,7 +9,6 @@ from pathlib import Path
 
 import yaml
 
-
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".webp"}
 ALLOWED_CLASSES = {"0", "1", "2"}
 CLASS_NAMES = {"0": "Caries", "1": "Periapical Lesion", "2": "Impacted"}
@@ -89,12 +88,8 @@ def main() -> int:
     for split in ("train", "val", "test"):
         images, labels, counts = validate_split(root, split, cfg[split])
         total.update(counts)
-        print(
-            f"| {split} | {images} | {labels} | {counts['0']} | {counts['1']} | {counts['2']} |"
-        )
-    print(
-        f"| total | - | - | {total['0']} | {total['1']} | {total['2']} |"
-    )
+        print(f"| {split} | {images} | {labels} | {counts['0']} | {counts['1']} | {counts['2']} |")
+    print(f"| total | - | - | {total['0']} | {total['1']} | {total['2']} |")
     return 0
 
 
