@@ -50,9 +50,7 @@ def main() -> int:
         captured.append([tuple(t.shape[-2:]) for t in x])
 
     handles = [
-        m.register_forward_pre_hook(pre_hook)
-        for m in modules
-        if m.__class__.__name__ in {"Detect", "DyHeadDetect"}
+        m.register_forward_pre_hook(pre_hook) for m in modules if m.__class__.__name__ in {"Detect", "DyHeadDetect"}
     ]
     if len(handles) != 1:
         raise RuntimeError(f"{args.model}: expected one Detect/DyHeadDetect module, found {len(handles)}")
