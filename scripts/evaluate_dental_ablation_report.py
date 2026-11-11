@@ -9,7 +9,6 @@ from pathlib import Path
 
 import yaml
 
-
 REPO = Path(__file__).resolve().parents[1]
 RUNS = {
     "baseline": {
@@ -93,9 +92,7 @@ def read_metrics(run_dir: Path) -> dict | None:
         except Exception as exc:
             raise RuntimeError(f"Unable to parse {csv_path}: {exc}") from exc
         f1 = 0.0 if p + r == 0 else 2 * p * r / (p + r)
-        parsed.append(
-            {"epoch": epoch, "precision": p, "recall": r, "map50": map50, "map5095": map5095, "f1": f1}
-        )
+        parsed.append({"epoch": epoch, "precision": p, "recall": r, "map50": map50, "map5095": map5095, "f1": f1})
     return max(parsed, key=lambda x: x["map5095"])
 
 
@@ -182,7 +179,17 @@ def render_stage1(metrics: dict[str, dict]) -> str:
     lines.append(f"模型配置差异：`{model_pair[0]}` vs `{model_pair[1]}`，这是本阶段的结构变量。")
     lines.append("")
     all_up = all(improved.values())
-    missing = [name for key, name in [("precision", "Precision"), ("recall", "Recall"), ("map50", "mAP50"), ("map5095", "mAP50-95"), ("f1", "F1")] if not improved[key]]
+    missing = [
+        name
+        for key, name in [
+            ("precision", "Precision"),
+            ("recall", "Recall"),
+            ("map50", "mAP50"),
+            ("map5095", "mAP50-95"),
+            ("f1", "F1"),
+        ]
+        if not improved[key]
+    ]
     lines.append(f"Stage1 是否五项指标全部提升：{'是' if all_up else '否'}")
     lines.append(f"未提升指标：{', '.join(missing) if missing else '无'}")
     lines.append(f"是否建议保留 SPD-Conv：{'是' if all_up and fair else '否'}")
